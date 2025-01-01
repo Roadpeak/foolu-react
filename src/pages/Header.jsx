@@ -35,7 +35,8 @@ const Header = () => {
 
       {/* Buttons */}
       <div className="flex items-center space-x-4">
-        <button className="text-gray-700 hover:text-red-500">Sign in</button>
+        <button className="text-gray-700 hover:text-red-500" onClick={() =>
+                {navigate('/Signup')}}>Sign in</button>
         <button className="bg-red-500 text-white py-2 px-4 rounded-full">
           Join - Earn $5
         </button>

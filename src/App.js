@@ -12,6 +12,7 @@ const App = () => {
         <Route path="/" element={<Home />} /> {/* Default to home page */}
         <Route path="/VideoWatch" element={<VideoWatch />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/Signup" element={<Signup />} />
       </Routes>
     </div>
   );
