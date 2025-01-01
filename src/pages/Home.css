@@ -22,12 +22,12 @@ body {
     padding: 8px 12px;
     border-radius: 9999px;
     text-decoration: none;
-    background-color: rgba(59, 130, 246, 0.1); /* light blue background */
+    background-color: rgba(59, 130, 246, 0.1); 
     color: #3b82f6;
   }
   
   .category:hover {
-    background-color: rgba(59, 130, 246, 0.2); /* darker blue on hover */
+    background-color: rgba(59, 130, 246, 0.2); 
   }
   
   .video-section {

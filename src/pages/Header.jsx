@@ -1,29 +1,49 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; 
 
 const Header = () => {
+  const navigate = useNavigate(); 
+
   return (
     <header className="flex items-center justify-between p-4 shadow-md bg-white">
-      {/* Logo */}
-      <div className="text-2xl font-bold text-red-500">Foolu</div>
+      
+      <div className="text-2xl ml-2 font-bold text-red-500 cursor-pointer" onClick={() => navigate('/')}>
+        Foolu
+      </div>
 
-      {/* Language Dropdown */}
-      <div className="relative">
+      
+      <div className="relative ml-4">
         <select className="text-gray-600 bg-transparent border-none focus:outline-none">
           <option value="en">English</option>
           <option value="es">Español</option>
         </select>
       </div>
 
-      {/* Navigation Links */}
+      
       <nav className="flex-grow ml-6">
         <ul className="flex space-x-6 text-gray-700 font-medium">
-        <li className="hover:text-red-500 cursor-pointer">Home</li>
-         <li className="hover:text-red-500 cursor-pointer">Subscribe</li>
-          <li className="hover:text-red-500 cursor-pointer">Account</li>
+          <li
+            className="hover:text-red-500 cursor-pointer"
+            onClick={() => navigate('/')}
+          >
+            Home
+          </li>
+          <li
+            className="hover:text-red-500 cursor-pointer"
+            onClick={() => navigate('/subscribe')}
+          >
+            Subscribe
+          </li>
+          <li
+            className="hover:text-red-500 cursor-pointer"
+            onClick={() => navigate('/account')}
+          >
+            Account
+          </li>
         </ul>
       </nav>
 
-      {/* Search Bar */}
+      
       <div className="relative flex items-center">
         <input
           type="text"
@@ -33,11 +53,18 @@ const Header = () => {
         <i className="fas fa-search absolute left-3 text-gray-500"></i>
       </div>
 
-      {/* Buttons */}
-      <div className="flex items-center space-x-4">
-        <button className="text-gray-700 hover:text-red-500" onClick={() =>
-                {navigate('/Signup')}}>Sign in</button>
-        <button className="bg-red-500 text-white py-2 px-4 rounded-full">
+      
+      <div className="flex items-center space-x-4 ml-6">
+        <button 
+          className="text-gray-700 hover:text-red-500" 
+          onClick={() => navigate('/Signin')} 
+        >
+          Sign in
+        </button>
+        <button 
+          className="bg-red-500 text-white py-2 px-4 rounded-full"
+          onClick={() => navigate('/Signup')} 
+        >
           Join - Earn $5
         </button>
       </div>

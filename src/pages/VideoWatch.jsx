@@ -1,15 +1,14 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom'; // Import useLocation hook
-
+import { useLocation } from 'react-router-dom'; 
 const VideoWatch = () => {
-  const location = useLocation(); // Get location object
-  const { videoUrl } = location.state || {}; // Extract videoUrl from location state
+  const location = useLocation(); 
+  const { videoUrl } = location.state || {}; 
 
   if (!videoUrl) {
-    return <div>No video URL provided</div>; // Handle case where no video URL is passed
+    return <div>No video URL provided</div>; 
   }
 
-  console.log("Video URL received:", videoUrl); // Debugging
+  console.log("Video URL received:", videoUrl); 
 
   return (
     <div className="video-watch-container">
