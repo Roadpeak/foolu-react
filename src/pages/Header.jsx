@@ -30,7 +30,7 @@ const Header = () => {
           </li>
           <li
             className="hover:text-red-500 cursor-pointer"
-            onClick={() => navigate('/subscribe')}
+            onClick={() => navigate('/SubscribePage')}
           >
             Subscribe
           </li>
