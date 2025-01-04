@@ -1,0 +1,130 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+  
+  .App {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  .sidebar {
+    width: 200px;
+    background-color: #ef4444;
+    color: white;
+    padding-top: 20px;
+  }
+  
+  .sidebar a {
+    display: block;
+    color: white;
+    padding: 15px;
+    text-decoration: none;
+  }
+  
+  .sidebar a:hover {
+    background-color: #ec9797;
+  }
+  
+  .text {
+    text-align: left;
+  }
+  
+  .divider {
+    border: none;
+    border-top: 2px solid #f1f1f1;
+    margin: 10px 0;
+  }
+  
+  .content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(29, 28, 28, 0.1);
+    width: 600px;
+    height: 500px;
+    margin-left: -100px;
+    margin-top: -50px;
+    text-align: center;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+  }
+  
+  .withdraw-button {
+    background-color: white;
+    color: rgb(66, 63, 63);
+    border: 2px solid #f1f1f1;
+    padding: 5px 20px;
+    border-radius: 5px;
+    width: 150px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .withdraw-button:hover {
+    border-color: #ec9797;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 10px;
+    margin-left: 50px;
+  }
+  
+  .input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+  }
+  
+  .input-field {
+    border: 2px solid #f1f1f1;
+    padding: 10px;
+    border-radius: 5px;
+    width: 300px;
+    transition: border-color 0.3s, background-color 0.3s;
+  }
+  
+  .input-field:hover {
+    border-color: rgb(239, 71, 71);
+    background-color: #f0f0f0;
+  }
+  
+  .card-logo {
+    width: 40px;
+    height: auto;
+  }
+  
+  .submit-button {
+    background-color: #ef4444;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 20px;
+  }
+  
+  .submit-button:hover {
+    background-color: darkblue;
+  }
+  
