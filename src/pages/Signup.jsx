@@ -60,6 +60,14 @@ const Signup = () => {
                                 required
                             />
                         </div>
+                        <div className="mb-4">
+                            <input
+                                type="Role"
+                                placeholder="Creator/Viewer"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                required
+                            />
+                        </div>
 
                        
                         <div className="flex items-start gap-2 mb-6">
