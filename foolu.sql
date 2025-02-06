@@ -1,0 +1,1 @@
+SELECT * FROM foolu.foolu_users;

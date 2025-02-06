@@ -1,53 +1,48 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
-import Header from './Header'; 
-import './Home.css'; 
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Header from './Header';
+import './Home.css';
+import axios from 'axios';
 
-const Home = () => {  
-  const [videos, setVideos] = useState([
-    "https://www.youtube.com/embed/videoID1",
-    "https://www.youtube.com/embed/videoID2",
-    "https://www.youtube.com/embed/videoID3",
-    "https://www.youtube.com/embed/videoID4",
-    "https://www.youtube.com/embed/videoID5",
-    "https://www.youtube.com/embed/videoID6",
-    "https://www.youtube.com/embed/videoID7",
-    "https://www.youtube.com/embed/videoID8",
-    "https://www.youtube.com/embed/videoID9",
-    "https://www.youtube.com/embed/videoID10",
-    "https://www.youtube.com/embed/videoID11",
-    "https://www.youtube.com/embed/videoID12",
-    "https://www.youtube.com/embed/videoID13",  
-    "https://www.youtube.com/embed/videoID14",  
-    "https://www.youtube.com/embed/videoID15",  
-    "https://www.youtube.com/embed/MQ5IQiynrjU?si=VmIoqsqC8LjpE56v", 
-    "https://www.youtube.com/embed/_lz_icer6YQ?si=WhTlBa7cr9RjFOC9"  
-  ]);
+const Home = () => {
+  const [videos, setVideos] = useState([]);
+  const [category, setCategory] = useState('');
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  useEffect(() => {
+    loadVideos(category, page);
+  }, [category, page]);
 
-  const handleVideoClick = (videoUrl) => {
-    // Navigate to VideoWatch page with the video URL as a state
-    navigate('/VideoWatch', { state: { videoUrl } });
+  const loadVideos = (category, page) => {
+    setLoading(true);
+    axios.get(`http://localhost:5000/api/videos?category=${category}&page=${page}&limit=20`)
+      .then(response => {
+        setVideos(prevVideos => page === 1 ? response.data : [...prevVideos, ...response.data]);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the videos!', error);
+        setLoading(false);
+      });
   };
 
-  const loadMoreVideos = () => {
-    setVideos(prevVideos => [
-      ...prevVideos,
-      "https://www.youtube.com/embed/videoID16",
-      "https://www.youtube.com/embed/videoID17",
-      "https://www.youtube.com/embed/videoID18",
-      "https://www.youtube.com/embed/videoID19",
-      "https://www.youtube.com/embed/videoID20",
-      "https://www.youtube.com/embed/videoID21"
-    ]);
+  const handleVideoClick = (videoId) => {
+    navigate('/VideoWatch', { state: { videoId } });
   };
 
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight === e.target.scrollTop + e.target.clientHeight;
-    if (bottom) {
-      loadMoreVideos();
+    if (bottom && !loading) {
+      setPage(prevPage => prevPage + 1);
     }
+  };
+
+  const handleCategoryChange = (newCategory) => {
+    setVideos([]);
+    setCategory(newCategory);
+    setPage(1);
   };
 
   return (
@@ -56,15 +51,15 @@ const Home = () => {
       <div className="categories mb-6 p-6">
         <h3 className="text-xl font-semibold mb-4">Video Categories</h3>
         <div className="flex space-x-6 overflow-x-auto">
-          <a href="#" className="category text-blue-500 hover:underline">Trending</a>
-          <a href="#" className="category text-blue-500 hover:underline">Music</a>
-          <a href="#" className="category text-blue-500 hover:underline">Gaming</a>
-          <a href="#" className="category text-blue-500 hover:underline">Sports</a>
-          <a href="#" className="category text-blue-500 hover:underline">News</a>
-          <a href="#" className="category text-blue-500 hover:underline">Technology</a>
-          <a href="#" className="category text-blue-500 hover:underline">Lifestyle</a>
-          <a href="#" className="category text-blue-500 hover:underline">Comedy</a>
-          <a href="#" className="category text-blue-500 hover:underline">Education</a>
+          {['Trending', 'Music', 'Gaming', 'Sports', 'News', 'Technology', 'Lifestyle', 'Comedy', 'Education'].map(cat => (
+            <button 
+              key={cat} 
+              className="category text-blue-500 hover:underline bg-transparent border-none cursor-pointer" 
+              onClick={() => handleCategoryChange(cat)}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -73,21 +68,17 @@ const Home = () => {
         onScroll={handleScroll}
       >
         <div className="video-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6">
-          {videos.map((videoUrl, index) => (
-            <div key={index} className="video-item" onClick={() => handleVideoClick(videoUrl)}>
-              <iframe 
-                width="560"  // Set width to 560px
-                height="315"  // Set height to 315px
-                src={videoUrl} 
-                title={`YouTube video ${index + 1}`} 
-                frameBorder="0" 
-                className="rounded-lg"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-                allowFullScreen
-              />
+          {videos.map((video, index) => (
+            <div 
+              key={index} 
+              className="video-item" 
+              onClick={() => handleVideoClick(video.videoId)}
+            >
+              <img src={video.thumbnailUrl} alt="Video thumbnail" />
             </div>
           ))}
         </div>
+        {loading && <p>Loading more videos...</p>}
       </div>
     </div>
   );

@@ -1,7 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from './Header'; // Import Header component
+import axios from 'axios';
 
 const SignIn = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.username || !formData.password) {
+      alert('Please fill in both fields');
+      return;
+    }
+    axios.post('http://localhost:5000/api/signin', formData)
+      .then(response => {
+        alert('User signed in successfully');
+        localStorage.setItem('token', response.data.token);
+      })
+      .catch(error => {
+        console.error('There was an error signing in the user!', error);
+        alert(error.response?.data || 'An error occurred during sign in');
+      });
+  };
+
   return (
     <div>
       {/* Header Component */}
@@ -21,7 +48,7 @@ const SignIn = () => {
                 <i className="fab fa-twitter"></i>
               </button>
             </div>
-            <form>
+            <form onSubmit={handleSubmit}>
               {/* Username */}
               <div className="mb-4">
                 <label className="block text-gray-600 mb-2" htmlFor="username">
@@ -29,8 +56,11 @@ const SignIn = () => {
                 </label>
                 <input
                   id="username"
+                  name="username"
                   type="text"
                   placeholder="Username"
+                  value={formData.username}
+                  onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-400"
                 />
               </div>
@@ -42,8 +72,11 @@ const SignIn = () => {
                 </label>
                 <input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-400"
                 />
               </div>

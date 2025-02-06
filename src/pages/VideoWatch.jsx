@@ -1,29 +1,42 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom'; 
+
 const VideoWatch = () => {
   const location = useLocation(); 
-  const { videoUrl } = location.state || {}; 
+  const { videoId } = location.state || {}; 
+  const playerRef = useRef(null);
 
-  if (!videoUrl) {
-    return <div>No video URL provided</div>; 
+  useEffect(() => {
+    if (videoId) {
+      window.onYouTubeIframeAPIReady = () => {
+        playerRef.current = new window.YT.Player('player', {
+          height: '315',
+          width: '560',
+          videoId,
+          events: {
+            onReady: (event) => {
+              event.target.playVideo();
+            }
+          }
+        });
+      };
+
+      if (window.YT) {
+        window.onYouTubeIframeAPIReady();
+      }
+    }
+  }, [videoId]);
+
+  if (!videoId) {
+    return <div>No video ID provided</div>; 
   }
 
-  console.log("Video URL received:", videoUrl); 
+  console.log("Video ID received:", videoId);
 
   return (
     <div className="video-watch-container">
       <h1>Watch Video</h1>
-      <div className="video-player">
-        <iframe 
-          width="560" 
-          height="315" 
-          src={videoUrl} 
-          title="Video player" 
-          frameBorder="0" 
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-          allowFullScreen 
-        />
-      </div>
+      <div className="video-player" id="player" />
     </div>
   );
 };
