@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import Header from './Header';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -21,6 +24,7 @@ const Signup = () => {
       .post('http://localhost:5000/api/signup', formData)
       .then((response) => {
         console.log('User registered successfully');
+        navigate("/ ");
       })
       .catch((error) => {
         console.error('There was an error registering the user!', error);
@@ -29,8 +33,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-
       <div className="flex flex-1">
         <div className="flex-1 bg-purple-100 flex items-center justify-center">
           <img src="ty.jpg" alt="Illustration" className="w-4/5" />

@@ -1,0 +1,40 @@
+/* Prevent scrolling on the whole page */
+html, body {
+    overflow: hidden;  /* Disable scrolling */
+    height: 100%;
+    margin: 0;
+  }
+  
+  /* Ensure video container does not cause overflow */
+  .video-watch-container {
+    max-height: 100vh;  /* Limit height */
+    overflow: hidden;   /* Prevent unwanted scroll */
+  }
+  
+  /* Fix progress bar at the bottom */
+  .video-progress-bar {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    z-index: 1000;  /* Keep it above other elements */
+  }
+  
+  /* Fix congrats message positioning */
+  .congrats-message {
+    position: sticky;
+    bottom: 40px; /* Adjust as needed */
+    width: 100%;
+    text-align: center;
+    background: white;
+    z-index: 1000;
+    padding: 10px;
+  }
+  
+  /* Ensure chatbox is the only scrollable element */
+  .chatbox {
+    height: 300px; /* Adjust as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #ccc;
+  }
+  

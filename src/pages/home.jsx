@@ -17,13 +17,17 @@ const Home = () => {
 
   const loadVideos = (category, page) => {
     setLoading(true);
-    axios.get(`http://localhost:5000/api/videos?category=${category}&page=${page}&limit=20`)
+    axios.get(`http://localhost:5000/api/videos?category=${category}`)
       .then(response => {
-        setVideos(prevVideos => page === 1 ? response.data : [...prevVideos, ...response.data]);
+        //console.log("API Response:", response.data); // Debugging line
+        const fetchedVideos = Array.isArray(response.data) ? response.data : []; // Ensure it's an array
+  
+        setVideos(prevVideos => (page === 1 ? fetchedVideos : [...prevVideos, ...fetchedVideos]));
         setLoading(false);
       })
       .catch(error => {
-        console.error('There was an error fetching the videos!', error);
+        console.error('Error fetching videos:', error);
+        setVideos([]); // Ensure videos is never undefined
         setLoading(false);
       });
   };
@@ -47,11 +51,10 @@ const Home = () => {
 
   return (
     <div className="font-sans">
-      <Header />
       <div className="categories mb-6 p-6">
         <h3 className="text-xl font-semibold mb-4">Video Categories</h3>
         <div className="flex space-x-6 overflow-x-auto">
-          {['Trending', 'Music', 'Gaming', 'Sports', 'News', 'Technology', 'Lifestyle', 'Comedy', 'Education'].map(cat => (
+          {['Trending', 'Music', 'Gaming', 'Sports', 'News', 'Technology', 'Lifestyle', 'Comedy', 'Education','Recipe','Kenya','Travel','Fashion','ASMR'].map(cat => (
             <button 
               key={cat} 
               className="category text-blue-500 hover:underline bg-transparent border-none cursor-pointer" 
