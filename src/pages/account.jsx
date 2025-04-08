@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Header from './Header'; // Assuming Header component exists and is correctly imported
 import { useAuth } from '../context/authContext'; // Assuming authContext.js is in ../context/
-import { Briefcase, LayoutDashboard, Banknote, Settings, BarChartBig, UserCircle } from 'lucide-react'; // Ensure all needed icons are imported (Removed UserCog as it wasn't used)
+import {
+  Briefcase, LayoutDashboard, Banknote, Settings, BarChartBig, UserCircle,
+  LinkIcon, TargetIcon, BellIcon, CheckCircleIcon, PlayCircleIcon, ClockIcon, UsersIcon, EyeIcon  // <<< ADDED THESE ICONS
+} from 'lucide-react'; // Ensure all needed icons are imported (Removed UserCog as it wasn't used)
 import axios from 'axios'; // Import axios
 
 // --- Shared UI Components ---
@@ -259,19 +262,44 @@ const UserSettingsView = () => {
     );
 };
 
-const DashboardView = () => {
-    const { username, profilePictureUrl } = useAuth();
-    // TODO: Fetch dashboard data (balance, stats)
-    const balance = 500.00; const videosWatchedTotal = 120; const videosToday = 20; const earningsToday = 50; const timeWatchedPercent = 75;
-    const displayPic = profilePictureUrl || '/default-avatar.png';
-    return (
-        <div className="space-y-8">
-          <div className="flex items-center space-x-4"> <img src={displayPic} alt="Profile" onError={(e) => { e.target.onerror = null; e.target.src='/default-avatar.png'}} className="w-16 h-16 rounded-full border-2 border-pink-300 shadow-sm object-cover bg-gray-100"/> <div> <h2 className="text-xl font-semibold text-gray-800">{username || 'User'}</h2> <p className="text-sm text-gray-500">Welcome back!</p> </div> </div>
-          <div className="bg-gradient-to-r from-pink-500 to-red-500 p-6 rounded-lg shadow-md text-white"> <h3 className="text-sm font-medium uppercase tracking-wider mb-1">Account Balance</h3> <p className="text-3xl font-bold">${balance.toFixed(2)}</p> </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6"> <StatCard title="Total Videos Watched" value={videosWatchedTotal} icon={BarChartBig}/> <StatCard title="Today's Videos | Earnings" value={`${videosToday} | $${earningsToday.toFixed(2)}`} icon={Banknote} /> </div>
-          <div className="bg-white p-6 rounded-lg shadow border border-gray-200"> <h3 className="text-lg font-semibold mb-3 text-gray-800">Time Watched Today</h3> <ProgressBar value={timeWatchedPercent} label={`${(timeWatchedPercent/25).toFixed(1)} Hours / 4 Hours Goal`} /> </div>
+const ViewerDashboardView = () => {
+  const { username, profilePictureUrl } = useAuth();
+  // TODO: Fetch VIEWER dashboard data (balance, watch stats)
+  const balance = 500.00; // Placeholder
+  const videosWatchedTotal = 120; // Placeholder
+  const videosToday = 20; // Placeholder
+  const earningsToday = 50; // Placeholder
+  const timeWatchedPercent = 75; // Placeholder
+  const displayPic = profilePictureUrl || '/default-avatar.png';
+
+  return (
+      <div className="space-y-8">
+        {/* Profile Header */}
+        <div className="flex items-center space-x-4">
+          <img src={displayPic} alt="Profile" onError={(e) => { e.target.onerror = null; e.target.src='/default-avatar.png'}} className="w-16 h-16 rounded-full border-2 border-pink-300 shadow-sm object-cover bg-gray-100"/>
+          <div>
+             <h2 className="text-xl font-semibold text-gray-800">{username || 'User'}</h2>
+             <p className="text-sm text-gray-500">Welcome back, Viewer!</p> {/* Specific title */}
+          </div>
         </div>
-      );
+        {/* Account Balance */}
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-lg shadow-md text-white"> {/* Different color maybe */}
+          <h3 className="text-sm font-medium uppercase tracking-wider mb-1">Your Earnings Balance</h3>
+          <p className="text-3xl font-bold">${balance.toFixed(2)}</p>
+           <p className="text-xs mt-2 opacity-80">Withdrawals available above $5.00</p>
+        </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+           <StatCard title="Total Videos Watched" value={videosWatchedTotal.toLocaleString()} icon={PlayCircleIcon}/> {/* Example Icon */}
+           <StatCard title="Today: Videos | Earnings" value={`${videosToday} | $${earningsToday.toFixed(2)}`} icon={Banknote} />
+        </div>
+         {/* Time Watched */}
+        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+            <h3 className="text-lg font-semibold mb-3 text-gray-800 flex items-center"><ClockIcon className="w-5 h-5 mr-2 text-indigo-500"/>Time Watched Today</h3>
+            <ProgressBar value={timeWatchedPercent} label={`${(timeWatchedPercent/25).toFixed(1)} Hours / 4 Hours Goal`} />
+        </div>
+      </div>
+    );
 };
 
 const WithdrawalView = () => {
@@ -285,31 +313,166 @@ const WithdrawalView = () => {
     );
 };
 
-const CreatorDashboard = () => {
-    // TODO: Fetch creator stats
-    return (
-    <div className="space-y-8">
-       <div className="flex items-center space-x-4 pb-4 border-b border-gray-200"> <img src="/cat.jpg" alt="Creator Profile" className="w-16 h-16 rounded-full border-2 border-pink-300 shadow-sm"/> <div> <h2 className="text-xl font-semibold text-gray-800">Creator Name</h2> <p className="text-sm text-gray-500">Creator Stats</p> </div> </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6"> <StatCard title="Today Views" value="1,234" /> <StatCard title="New Subs Today" value="56" /> <StatCard title="Avg Watch Time" value="5m 12s" /> <StatCard title="Engagement" value="123 | 45" /> </div>
-      <div className="bg-white p-6 rounded-lg shadow border border-gray-200 space-y-6"> <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Goals</h3> <ProgressBar value={12} label="Views Goal (1k/10k)" /> <ProgressBar value={5} label="Subs Goal (56/1k)" /> </div>
-    </div>
-  );
-  }
+const CreatorDashboardView = () => {
+  const { username, profilePictureUrl } = useAuth();
+  // TODO: Fetch CREATOR stats (views, subs, earnings *from their content*, promo balance link?)
+  const viewsToday = 1234;
+  const subsToday = 56;
+  const avgWatchTime = "5m 12s";
+  const engagement = "123 | 45";
+  const viewsGoalProgress = 12;
+  const subsGoalProgress = 5;
+  const displayPic = profilePictureUrl || '/default-avatar.png'; // Or creator-specific default
 
-const CreatorSettings = () => {
-    // TODO: Fetch settings & handle submit
-    return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-3">Creator Settings</h1>
-      <form className="space-y-6 bg-white p-6 rounded-lg shadow border border-gray-200">
-        <div> <label htmlFor="channel-link" className="block text-sm font-medium text-gray-700 mb-1">Channel Link</label> <input id="channel-link" type="text" className="input-style" placeholder="https://..."/> </div>
-        <fieldset> <legend className="block text-sm font-medium text-gray-700 mb-1">Goals</legend> <div className="space-y-3"> <div> <label htmlFor="views-goal" className="sr-only">Views</label> <input id="views-goal" type="number" min="0" className="input-style" placeholder="Monthly Views Goal"/> </div> <div> <label htmlFor="subs-goal" className="sr-only">Subs</label> <input id="subs-goal" type="number" min="0" className="input-style" placeholder="Monthly Subs Goal"/> </div> </div> </fieldset>
-        <div> <label htmlFor="notifications" className="block text-sm font-medium text-gray-700 mb-1">Notifications</label> <select id="notifications" className="input-style bg-white"> <option>Enable</option> <option>Milestones</option> <option>Disable</option> </select> </div>
-        <button type="submit" className="submit-button-style"> Save Settings </button> {/* Define shared styles */}
-      </form>
+  return (
+  <div className="space-y-8">
+     {/* Creator Header */}
+     <div className="flex items-center space-x-4 pb-4 border-b border-gray-200">
+      <img src={displayPic} alt="Creator Profile" onError={(e) => { e.target.onerror = null; e.target.src='/default-avatar.png'}} className="w-16 h-16 rounded-full border-2 border-pink-300 shadow-sm object-cover bg-gray-100"/>
+      <div>
+         <h2 className="text-xl font-semibold text-gray-800">{username || 'Creator'}</h2>
+         <p className="text-sm text-gray-500">Your Creator Dashboard</p>
+      </div>
     </div>
-  );
-  }
+    {/* Stats Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <StatCard title="Today's Video Views" value={viewsToday.toLocaleString()} icon={EyeIcon}/>
+      <StatCard title="New Subscribers Today" value={`+${subsToday}`} icon={UsersIcon}/>
+      <StatCard title="Average Watch Time" value={avgWatchTime} icon={ClockIcon}/>
+      <StatCard title="Engagement (Likes | Comments)" value={engagement} icon={BarChartBig}/>
+    </div>
+    {/* Goals Section */}
+    <div className="bg-white p-6 rounded-lg shadow border border-gray-200 space-y-6">
+        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4 flex items-center"><TargetIcon className="w-5 h-5 mr-2 text-pink-600"/>Goals Progress</h3>
+        <ProgressBar value={viewsGoalProgress} label={`Views Goal (${(viewsToday * 30).toLocaleString()} / 10,000 Est.)`} />
+        <ProgressBar value={subsGoalProgress} label={`Subscribers Goal (${(subsToday * 30).toLocaleString()} / 1,000 Est.)`} />
+    </div>
+  </div>
+);
+}
+
+  const CreatorSettings = () => {
+    // TODO: Fetch current settings in useEffect and set initial state
+    const [channelLink, setChannelLink] = useState('');
+    const [viewsGoal, setViewsGoal] = useState('');
+    const [subsGoal, setSubsGoal] = useState('');
+    const [notifications, setNotifications] = useState('enable'); // Default value
+    const [isLoading, setIsLoading] = useState(false);
+    const [saveMessage, setSaveMessage] = useState({ type: '', text: '' });
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setIsLoading(true);
+        setSaveMessage({ type: '', text: ''});
+        console.log("Saving Creator Settings:", { channelLink, viewsGoal, subsGoal, notifications });
+        // --- TODO: Implement API call to save settings ---
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+            // Assume success
+            setSaveMessage({ type: 'success', text: 'Settings saved successfully!'});
+        } catch (error) {
+            console.error("Error saving settings:", error);
+            setSaveMessage({ type: 'error', text: 'Failed to save settings.'});
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        // Use max-width for better readability on large screens
+        <div className="max-w-3xl mx-auto">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4 pb-4 border-b border-gray-200">
+                Creator Settings
+            </h1>
+            <p className="text-sm text-gray-500 mb-8">
+                Manage your channel information, set goals for your promotions, and configure notification preferences.
+            </p>
+
+            {/* Use a card-like structure for the form */}
+            <form onSubmit={handleSubmit} className="space-y-8 bg-white p-6 sm:p-8 rounded-lg shadow-md border border-gray-200">
+
+                {/* Channel Link Section */}
+                <div className="space-y-2">
+                     <label htmlFor="channel-link" className="flex items-center text-lg font-semibold text-gray-700 mb-1">
+                       <LinkIcon className="w-5 h-5 mr-2 text-pink-600" />
+                       Your Channel
+                     </label>
+                     <p className="text-sm text-gray-500 mb-2">Link your primary YouTube channel to display on your profile.</p>
+                    <FormInput
+                        id="channel-link"
+                        type="url" // Use type="url" for better semantics/validation
+                        placeholder="https://youtube.com/c/YourChannel"
+                        value={channelLink}
+                        onChange={(e) => setChannelLink(e.target.value)}
+                        // Add required if necessary
+                    />
+                </div>
+
+                {/* Goals Section - using fieldset for grouping */}
+                 <fieldset className="border-t border-gray-200 pt-6">
+                    <legend className="flex items-center text-lg font-semibold text-gray-700 mb-1">
+                      <TargetIcon className="w-5 h-5 mr-2 text-pink-600" />
+                      Promotion Goals
+                    </legend>
+                    <p className="text-sm text-gray-500 mb-4">Set monthly goals for your video promotions (optional).</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormInput
+                            id="views-goal"
+                            type="number"
+                            label="Monthly Views Goal"
+                            min="0"
+                            placeholder="e.g., 10000"
+                            value={viewsGoal}
+                            onChange={(e) => setViewsGoal(e.target.value)}
+                        />
+                        <FormInput
+                            id="subs-goal"
+                            type="number"
+                            label="Monthly Subscribers Goal"
+                            min="0"
+                            placeholder="e.g., 1000"
+                            value={subsGoal}
+                            onChange={(e) => setSubsGoal(e.target.value)}
+                        />
+                    </div>
+                </fieldset>
+
+                {/* Notifications Section */}
+                 <div className="border-t border-gray-200 pt-6 space-y-2">
+                     <label htmlFor="notifications" className="flex items-center text-lg font-semibold text-gray-700 mb-1">
+                       <BellIcon className="w-5 h-5 mr-2 text-pink-600" />
+                       Notifications
+                     </label>
+                      <p className="text-sm text-gray-500 mb-2">Choose how you want to be notified about campaign progress and milestones.</p>
+                    <select
+                        id="notifications"
+                        value={notifications}
+                        onChange={(e) => setNotifications(e.target.value)}
+                        // Reuse FormInput's styling or create a dedicated Select component style
+                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm bg-white appearance-none"
+                    >
+                        <option value="enable">Enable All Platform Notifications</option>
+                        <option value="milestones">Campaign Milestones Only</option>
+                        <option value="disable">Disable All Platform Notifications</option>
+                    </select>
+                </div>
+
+                 {/* Save Button and Message Area */}
+                 <div className="border-t border-gray-200 pt-6">
+                      {saveMessage.text && (
+                        <p className={`text-sm mb-4 text-center ${saveMessage.type === 'error' ? 'text-red-600' : 'text-green-600'}`}>
+                          {saveMessage.text}
+                        </p>
+                      )}
+                    <SubmitButton isLoading={isLoading} disabled={isLoading}>
+                        <CheckCircleIcon className="w-5 h-5 mr-2 -ml-1"/> {/* Example icon */}
+                        Save Settings
+                    </SubmitButton>
+                 </div>
+            </form>
+        </div>
+    );
+}
 
 const CreatorBrokerageView = () => {
     // TODO: Fetch data
@@ -355,42 +518,84 @@ const CreatorBrokerageView = () => {
 // --- Main Account Page Component ---
 const AccountPage = () => {
   const { role, isLoading, isAuthenticated } = useAuth();
-  const [view, setView] = useState('dashboard');
-  const creatorViewNames = ['creator-dashboard', 'creator-settings', 'creator-promotions'];
 
-  const baseNavigation = [ { name: 'Dashboard', view: 'dashboard', icon: LayoutDashboard }, { name: 'Withdrawal', view: 'withdrawal', icon: Banknote }, { name: 'User Settings', view: 'user-settings', icon: UserCircle }, ];
-  const creatorNavigation = [ { name: 'Creator Dashboard', view: 'creator-dashboard', icon: BarChartBig }, { name: 'Creator Settings', view: 'creator-settings', icon: Settings }, { name: 'Video Promotions', view: 'creator-promotions', icon: Briefcase }, ];
-  const navigation = isLoading || !isAuthenticated ? [] : [...baseNavigation, ...(role === 'creator' ? creatorNavigation : [])];
+  // Determine the 'main' dashboard view name based on role
+  const mainDashboardView = role === 'creator' ? 'creator-dashboard' : 'viewer-dashboard';
+  const [view, setView] = useState(mainDashboardView); // Default to the role-appropriate dashboard
 
+  // Define view names accessible only to creators
+  const creatorOnlyViews = ['creator-dashboard', 'creator-settings', 'creator-promotions'];
+  // Define view names accessible only to viewers (excluding settings)
+  const viewerOnlyViews = ['viewer-dashboard', 'withdrawal'];
+
+  // --- Define Navigation Items ---
+  const viewerNavigation = [
+    { name: 'Dashboard', view: 'viewer-dashboard', icon: LayoutDashboard },
+    { name: 'Withdrawal', view: 'withdrawal', icon: Banknote },
+    { name: 'User Settings', view: 'user-settings', icon: UserCircle },
+  ];
+  const creatorNavigation = [
+    { name: 'Creator Dashboard', view: 'creator-dashboard', icon: BarChartBig },
+    { name: 'Video Promotions', view: 'creator-promotions', icon: Briefcase },
+    { name: 'Creator Settings', view: 'creator-settings', icon: Settings },
+    { name: 'User Settings', view: 'user-settings', icon: UserCircle }, // Creators also have user settings
+  ];
+
+  // Select the correct navigation based on role
+  const navigation = isLoading || !isAuthenticated ? [] : (role === 'creator' ? creatorNavigation : viewerNavigation);
+
+  // Effect to handle initial view setting and role changes
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-        if (creatorViewNames.includes(view) && role !== 'creator') { setView('dashboard'); }
-        else if (!navigation.some(item => item.view === view) && navigation.length > 0) { setView(navigation[0].view); }
+        const defaultView = role === 'creator' ? 'creator-dashboard' : 'viewer-dashboard';
+        // If current view is not in the allowed navigation for the role, reset to default
+        if (!navigation.some(item => item.view === view)) {
+            console.log(`View ${view} invalid for role ${role}, resetting to ${defaultView}`);
+            setView(defaultView);
+        }
     }
-    if (!isAuthenticated && !isLoading) { setView('dashboard'); }
+     // Reset if logged out
+    if (!isAuthenticated && !isLoading) {
+        setView('viewer-dashboard'); // Default to viewer dash view name conceptually
+    }
+  // Rerun when role or loading state changes (navigation changes automatically with role/loading)
   }, [role, view, isLoading, isAuthenticated, navigation]);
 
-  if (isLoading) return ( <div className="min-h-screen flex flex-col bg-gray-100"> <Header /> <div className="flex flex-1 justify-center items-center text-lg text-gray-600">Loading...</div> </div> );
-  if (!isAuthenticated) return ( <div className="min-h-screen flex flex-col bg-gray-100"> <Header /> <div className="flex flex-1 justify-center items-center text-red-500">Please sign in.</div> </div> );
+  // --- Render Loading / Not Authenticated States ---
+  if (isLoading) return ( <div className="page-container"> <Header /> <div className="content-center">Loading...</div> </div> );
+  if (!isAuthenticated) return ( <div className="page-container"> <Header /> <div className="content-center text-red-500">Please sign in.</div> </div> );
 
+  // --- Render Main Account Page ---
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <div className="flex flex-1 overflow-hidden pt-4 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row bg-white shadow-xl rounded-lg overflow-hidden w-full max-w-7xl mx-auto border border-gray-200">
+          {/* Sidebar */}
           <aside className="w-full md:w-64 flex-shrink-0 bg-gray-50 border-r border-gray-200 p-4 md:p-6">
             <nav className="space-y-1">
-              {navigation.map((item) => ( <NavItem key={item.name} icon={item.icon} label={item.name} isActive={view === item.view} onClick={() => setView(item.view)} /> ))}
-              {role === 'viewer' && ( <button className="mt-6 w-full text-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-gradient" onClick={() => alert('Redirect')}> Become Creator </button> )} {/* Use reusable style */}
+              {navigation.map((item) => (
+                <NavItem key={item.name} icon={item.icon} label={item.name} isActive={view === item.view} onClick={() => setView(item.view)} />
+              ))}
+              {role === 'viewer' && (
+                <button className="mt-6 w-full text-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-gradient" onClick={() => alert('Redirect to Become Creator')}> Become Creator </button>
+              )}
             </nav>
           </aside>
+          {/* Main Content */}
           <main className="flex-1 p-6 md:p-10 overflow-y-auto">
-            {view === 'dashboard' && <DashboardView />}
-            {view === 'withdrawal' && <WithdrawalView />}
+            {/* Render the correct dashboard based on role */}
+            {role === 'viewer' && view === 'viewer-dashboard' && <ViewerDashboardView />}
+            {role === 'creator' && view === 'creator-dashboard' && <CreatorDashboardView />}
+
+            {/* Render other views */}
+            {role === 'viewer' && view === 'withdrawal' && <WithdrawalView />}
             {view === 'user-settings' && <UserSettingsView />}
-            {role === 'creator' && view === 'creator-dashboard' && <CreatorDashboard />}
             {role === 'creator' && view === 'creator-settings' && <CreatorSettings />}
             {role === 'creator' && view === 'creator-promotions' && <CreatorBrokerageView />}
-            {creatorViewNames.includes(view) && role !== 'creator' && ( <div className="access-denied-msg"> Access Denied. </div> )} {/* Use reusable style */}
+
+            {/* Optional: Add a more robust fallback/error message if view state is somehow invalid */}
+            {/* { !navigation.some(item => item.view === view) && <div>Error: Invalid view selected.</div> } */}
+
           </main>
         </div>
       </div>

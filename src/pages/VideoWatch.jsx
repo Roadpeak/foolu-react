@@ -118,40 +118,53 @@ const VideoWatch = () => {
         console.log("Player Playing");
         // Start interval to track progress and detect seeking
         intervalRef.current = setInterval(() => {
-          if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function' && typeof playerRef.current.getDuration === 'function') {
+          if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function' && typeof playerRef.current.getDuration === 'function' ) {
             const currentTime = playerRef.current.getCurrentTime();
             const duration = playerRef.current.getDuration();
-
+        
             if (duration && duration > 0) {
-              // --- Seek Detection Logic ---
               const timeDiff = currentTime - maxReachedTimeRef.current;
-
-              // Check for significant forward jump (seek), ignore initial load (maxTime=0)
+        
+              // Log values BEFORE checks/updates
+              console.log(`Tick: CurrentTime=${currentTime.toFixed(2)}, MaxReached=${maxReachedTimeRef.current.toFixed(2)}, Diff=${timeDiff.toFixed(2)}, FastForwarded=${fastForwarded}`);
+        
+              // Seek Detection Check
               if (timeDiff > SEEK_DETECTION_THRESHOLD && maxReachedTimeRef.current > 0 && !fastForwarded) {
-                console.warn(`Seek Detected! Jumped from ${maxReachedTimeRef.current.toFixed(2)}s to ${currentTime.toFixed(2)}s`);
-                setFastForwarded(true); // Set the flag permanently for this load
+                console.warn(`>>> SEEK DETECTED! <<<`);
+                setFastForwarded(true);
               }
-
-              // Update max time reached ONLY if not seeking and progressing normally
-              // Prevents seeking back to bypass detection
+        
+              // Update Max Reached Time
               if (!fastForwarded) {
-                 // Allow for small jumps/pauses, don't update max time if seeking back
-                if (timeDiff <= SEEK_DETECTION_THRESHOLD) {
+                if (timeDiff <= SEEK_DETECTION_THRESHOLD) { // Allow small jumps/staying put
+                    const previousMax = maxReachedTimeRef.current; // Store previous value
                     maxReachedTimeRef.current = Math.max(maxReachedTimeRef.current, currentTime);
+                    // Log if it actually changed
+                    if (maxReachedTimeRef.current > previousMax) {
+                        console.log(`MaxReached updated to: ${maxReachedTimeRef.current.toFixed(2)}`);
+                    }
+                } else {
+                    // Log large jumps even if already fastForwarded (for debugging)
+                    if (timeDiff > SEEK_DETECTION_THRESHOLD && maxReachedTimeRef.current > 0) {
+                         console.log(`Tick: Large forward jump (${timeDiff.toFixed(2)}s) but fastForwarded flag is already true.`);
+                    }
+                     // Log rewinds
+                     if (timeDiff < -SEEK_DETECTION_THRESHOLD) { // Check for significant rewind
+                          console.log(`Tick: Rewind detected (Diff: ${timeDiff.toFixed(2)}s). MaxReached stays at ${maxReachedTimeRef.current.toFixed(2)}.`);
+                     }
                 }
               }
-
-              // --- Progress Update ---
+        
+              // Progress Update
               const newProgress = (currentTime / duration) * 100;
-              setProgress(Math.min(100, newProgress)); // Cap progress at 100%
+              setProgress(Math.min(100, newProgress));
             }
           } else {
-            // Player instance might be gone, clear interval
-            if (intervalRef.current) clearInterval(intervalRef.current);
+             if (intervalRef.current) clearInterval(intervalRef.current);
           }
-        }, 1000); // Check every second
+        }, 1000); 
         break;
-
+        
       case window.YT.PlayerState.ENDED:
         console.log("Player Ended");
         if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } // Clear interval

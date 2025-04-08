@@ -120,33 +120,79 @@ router.post('/profile-picture', authenticateToken, (req, res) => { // <<< METHOD
         console.log("MULTER DEBUG: req.file seems valid:", JSON.stringify(req.file));
         const { userId } = req.user; // Assume authenticateToken worked
         const imageUrl = `/uploads/profile-pics/${req.file.filename}`;
+        let oldImageUrl = null; // Variable to store the old URL
+
         try {
-            // !! Use your actual DB column names !!
-            const updateQuery = 'UPDATE foolu_users SET profile_picture_url = ?, updated_at = CURRENT_TIMESTAMP WHERE userId = ?';
-            db.query(updateQuery, [imageUrl, userId], (updateErr, updateResult) => {
-                if (updateErr) {
-                    console.error("DB Error updating profile picture URL:", updateErr);
-                    fs.unlink(req.file.path, (unlinkErr) => { if(unlinkErr) console.error("Error deleting file after DB fail:", unlinkErr); });
-                    return res.status(500).json({ message: "Database error updating profile picture." });
-                }
-                if (updateResult.affectedRows === 0) {
-                    fs.unlink(req.file.path, (unlinkErr) => { if(unlinkErr) console.error("Error deleting file for non-existent user:", unlinkErr); });
-                    return res.status(404).json({ message: "User not found to update picture." });
+            // --- STEP 1: Fetch Old URL from DB ---
+            // Use YOUR actual table and column names
+            const selectQuery = 'SELECT profile_picture_url FROM foolu_users WHERE userId = ?';
+            db.query(selectQuery, [userId], (selectErr, selectResults) => {
+                if (selectErr) {
+                    console.error(`DB Error fetching old profile_picture_url for user ${userId}:`, selectErr);
+                    // Don't delete the new file yet, as we don't know if the user exists or if DB is down
+                    return res.status(500).json({ message: "Database error checking existing picture." });
                 }
 
-                console.log(`Profile picture updated successfully for userId: ${userId}`);
-                res.status(200).json({
-                    message: "Profile picture updated successfully!",
-                    newImageUrl: imageUrl // Send the URL back
-                });
-            });
-        } catch (error) {
-            console.error("Unexpected error during profile picture DB update:", error);
-            fs.unlink(req.file.path, (unlinkErr) => { if(unlinkErr) console.error("Error deleting file after unexpected error:", unlinkErr); });
+                if (selectResults.length > 0 && selectResults[0].profile_picture_url) {
+                    oldImageUrl = selectResults[0].profile_picture_url;
+                    console.log(`Found old image URL for user ${userId}: ${oldImageUrl}`);
+                } else {
+                    console.log(`No previous profile picture found for user ${userId}.`);
+                }
+
+                // --- STEP 2: Update Database with New URL ---
+                console.log(`Attempting DB update for user ${userId} with NEW URL ${newImageUrl}`);
+                const updateQuery = 'UPDATE foolu_users SET profile_picture_url = ?, updated_at = CURRENT_TIMESTAMP WHERE userId = ?';
+                db.query(updateQuery, [newImageUrl, userId], (updateErr, updateResult) => {
+                    if (updateErr) {
+                        console.error(`DB Error updating profile_picture_url for user ${userId}:`, updateErr);
+                        // Attempt to delete the NEWLY uploaded file because DB update failed
+                        fs.unlink(newFilePath, (unlinkErr) => { if(unlinkErr) console.error(`Error deleting NEW file ${newFilePath} after DB update fail:`, unlinkErr); });
+                        return res.status(500).json({ message: "Database error updating profile picture." });
+                    }
+                    if (updateResult.affectedRows === 0) {
+                        console.warn(`User not found during picture update attempt for userId: ${userId}`);
+                         // Attempt to delete the NEWLY uploaded file
+                        fs.unlink(newFilePath, (unlinkErr) => { if(unlinkErr) console.error(`Error deleting NEW file ${newFilePath} for non-existent user:`, unlinkErr); });
+                        return res.status(404).json({ message: "User not found to update picture." });
+                    }
+
+                    console.log(`>>> Profile picture DB updated SUCCESS for user ${userId}`);
+
+                    // --- STEP 3: Delete Old File (if one existed) ---
+                    if (oldImageUrl) {
+                        // Construct the full file system path for the old image
+                        // Assumes oldImageUrl starts with '/' and relates to the 'public' dir root
+                        const oldFilePath = path.join(__dirname, '..', '..', '..', 'public', oldImageUrl);
+                        console.log(`Attempting to delete old file for user ${userId}: ${oldFilePath}`);
+
+                        fs.unlink(oldFilePath, (unlinkErr) => {
+                            if (unlinkErr) {
+                                // Log error but don't fail the request - DB update was successful
+                                console.warn(`Could not delete old profile picture ${oldFilePath}:`, unlinkErr.message);
+                            } else {
+                                console.log(`Successfully deleted old profile picture: ${oldFilePath}`);
+                            }
+                        });
+                    }
+
+                    // --- STEP 4: Send Success Response to Frontend ---
+                    res.status(200).json({
+                        message: "Profile picture updated successfully!",
+                        newImageUrl: newImageUrl // Send the new URL back
+                    });
+                }); // End DB Update Query
+            }); // End DB Select Query
+
+        } catch (error) { // Catch unexpected synchronous errors (less likely here)
+            console.error(`Unexpected synchronous error during profile picture update for user ${userId}:`, error);
+             // Attempt to delete the NEWLY uploaded file if an error occurred after upload but before DB success
+             fs.unlink(newFilePath, (unlinkErr) => { if(unlinkErr) console.error(`Error deleting NEW file ${newFilePath} after unexpected error:`, unlinkErr); });
             res.status(500).json({ message: "Server error processing upload." });
         }
-    });
+    }); // End upload.single callback
 });
+
 
 /*router.get('/test', (req, res) => {
     console.log("--- TEST /api/user/test route hit! ---");
